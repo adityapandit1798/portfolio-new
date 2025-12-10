@@ -40,11 +40,11 @@ export const socialLinks = [
     },
     {
         title: "GitHub",
-        href: "https://github.com/AdityaPandit1",
+        href: "https://github.com/adityapandit1798",
     },
     {
         title: "Email",
-        href: "mailto:adityapandit1@gmail.com",
+        href: "mailto:pandit.aditya1798@gmail.com",
     },
 ];
 

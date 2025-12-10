@@ -8,8 +8,6 @@ export function PortfolioNavbar() {
         { name: 'Skills', url: '#skills', icon: Cpu },
         { name: 'Experience', url: '#experience', icon: Briefcase },
         { name: 'Projects', url: '#projects', icon: Layers },
-        // If you have a resume file in /public, use this:
-        { name: 'Resume', url: '/resume.pdf', icon: FileText }
     ]
 
     return <NavBar items={navItems} />

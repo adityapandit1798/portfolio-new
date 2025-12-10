@@ -26,10 +26,41 @@ export function NavBar({ items, className }: NavBarProps) {
             setIsMobile(window.innerWidth < 768)
         }
 
+        const handleScroll = () => {
+            const sections = items
+                .map((item) => {
+                    if (!item.url.startsWith("#")) return null
+                    const element = document.getElementById(item.url.substring(1))
+                    if (!element) return null
+                    return { name: item.name, element }
+                })
+                .filter((section): section is { name: string; element: HTMLElement } => section !== null)
+
+            const scrollPosition = window.scrollY + window.innerHeight / 3
+
+            for (const section of sections) {
+                const { element } = section
+                const { offsetTop, offsetHeight } = element
+
+                if (
+                    scrollPosition >= offsetTop &&
+                    scrollPosition < offsetTop + offsetHeight
+                ) {
+                    setActiveTab(section.name)
+                }
+            }
+        }
+
         handleResize()
+        handleScroll()
         window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize)
-    }, [])
+        window.addEventListener("scroll", handleScroll)
+
+        return () => {
+            window.removeEventListener("resize", handleResize)
+            window.removeEventListener("scroll", handleScroll)
+        }
+    }, [items])
 
     return (
         <div
