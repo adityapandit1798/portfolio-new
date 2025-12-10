@@ -154,19 +154,6 @@ export const SKILL_CATEGORIES = [
 // Experience Data
 export const EXPERIENCE_EVENTS = [
     {
-        id: "jawk",
-        date: "Mar 2022 – Jul 2024 · Pune, IN",
-        title: "Software Engineer · JAWK Softwares",
-        description:
-            "Designed AWS infrastructures using reusable Terraform modules (VPC, RDS, ALB, ASG) with remote state locking, cutting environment provisioning time by 80%. Led monolith-to-microservices migration using Docker multi-stage builds (60% smaller images, reduced vulnerability surface). Implemented event-driven pipelines with S3, SQS and Lambda to handle traffic spikes with 99.9% availability, and designed secure VPCs with public/private subnets and PrivateLink for S3/ECR.",
-        icon: CloudCog,
-        iconClass: "text-white w-5 h-5",
-        image:
-            "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2400&auto=format&fit=crop",
-        category: "Infrastructure as Code · AWS",
-        color: "indigo",
-    },
-    {
         id: "innspark",
         date: "Aug 2024 – Present · Pune, IN",
         title: "Cloud Engineer · Innspark Solutions",
@@ -177,6 +164,19 @@ export const EXPERIENCE_EVENTS = [
         image:
             "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?q=80&w=2400&auto=format&fit=crop",
         category: "Cloud · GitOps · Observability",
+        color: "indigo",
+    },
+    {
+        id: "jawk",
+        date: "Mar 2022 – Jul 2024 · Pune, IN",
+        title: "Software Engineer · JAWK Softwares",
+        description:
+            "Designed AWS infrastructures using reusable Terraform modules (VPC, RDS, ALB, ASG) with remote state locking, cutting environment provisioning time by 80%. Led monolith-to-microservices migration using Docker multi-stage builds (60% smaller images, reduced vulnerability surface). Implemented event-driven pipelines with S3, SQS and Lambda to handle traffic spikes with 99.9% availability, and designed secure VPCs with public/private subnets and PrivateLink for S3/ECR.",
+        icon: CloudCog,
+        iconClass: "text-white w-5 h-5",
+        image:
+            "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2400&auto=format&fit=crop",
+        category: "Infrastructure as Code · AWS",
         color: "indigo",
     },
 ]

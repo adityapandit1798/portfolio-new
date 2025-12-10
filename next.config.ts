@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     ],
   },
   // Add this back if you are NOT using a custom domain yet
-  basePath: '/portfolio-new',
+  // basePath: '/portfolio-new',
 };
 
 export default nextConfig;

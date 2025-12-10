@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
-import { motion, useAnimation } from "framer-motion"
-import { useInView } from "react-intersection-observer"
+import React, { useRef } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
 
 export interface TimelineEvent {
     id: string
@@ -44,108 +43,30 @@ const TimelineItem: React.FC<{
     index: number
     primaryColor: string
     accentColor: string
-    mousePosition: { x: number; y: number }
-    activeEvent: string | null
-    setActiveEvent: (id: string | null) => void
-}> = ({ event, index, primaryColor, accentColor, mousePosition, activeEvent, setActiveEvent }) => {
-    const [ref, inView] = useInView({
-        threshold: 0.3,
-        triggerOnce: false,
-    })
-    const controls = useAnimation()
-
-    useEffect(() => {
-        if (inView) {
-            controls.start("visible")
-        }
-    }, [controls, inView])
-
-    const isEven = index % 2 === 0
+}> = ({ event, index, primaryColor, accentColor }) => {
     const eventColor = event.color ? `bg-${event.color}-500` : primaryColor
 
     return (
-        <motion.div
-            key={event.id}
-            ref={ref}
-            className={`relative mb-16 md:mb-24 ${isEven ? "md:ml-auto" : "md:mr-auto"
-                } md:w-1/2 flex ${isEven ? "md:justify-start" : "md:justify-end"}`}
-            initial="hidden"
-            animate={controls}
-            variants={{
-                hidden: {
-                    opacity: 0,
-                    x: isEven ? 50 : -50,
-                    y: 20,
-                },
-                visible: {
-                    opacity: 1,
-                    x: 0,
-                    y: 0,
-                    transition: {
-                        duration: 0.8,
-                        ease: "easeOut",
-                    },
-                },
-            }}
-        >
+        <div className="relative w-[80vw] md:w-[600px] flex-shrink-0 px-4 md:px-8">
             {/* Timeline node */}
-            <div
-                className={`absolute left-1/2 md:left-auto ${isEven ? "md:left-0" : "md:right-0"
-                    } top-0 transform -translate-x-1/2 ${isEven ? "md:translate-x-0" : "md:translate-x-0"
-                    } z-20`}
-            >
-                <motion.div
-                    className={`w-10 h-10 rounded-full ${eventColor} flex items-center justify-center border-4 border-slate-950 cursor-pointer`}
-                    whileHover={{ scale: 1.2 }}
-                    onClick={() => setActiveEvent(activeEvent === event.id ? null : event.id)}
-                    animate={{
-                        boxShadow:
-                            activeEvent === event.id
-                                ? [
-                                    "0 0 0 rgba(255,255,255,0.4)",
-                                    "0 0 20px rgba(255,255,255,0.9)",
-                                    "0 0 0 rgba(255,255,255,0.4)",
-                                ]
-                                : "0 0 0 rgba(255,255,255,0)",
-                    }}
-                    transition={{
-                        repeat: activeEvent === event.id ? Infinity : 0,
-                        duration: 1.5,
-                    }}
+            <div className="absolute top-0 left-4 md:left-8 z-20 -translate-y-1/2">
+                <div
+                    className={`w-12 h-12 rounded-full ${eventColor} flex items-center justify-center border-4 border-slate-950 shadow-lg`}
                 >
                     {event.icon ? <event.icon className={event.iconClass} /> : <span className="text-white font-bold">{index + 1}</span>}
-                </motion.div>
+                </div>
             </div>
 
             {/* Content card */}
-            <motion.div
-                className={`relative z-10 bg-slate-900/90 backdrop-blur-lg rounded-2xl overflow-hidden shadow-xl w-full md:w-[calc(100%-2rem)] ${isEven ? "md:ml-12" : "md:mr-12"
-                    } border border-slate-800`}
-                whileHover={{
-                    y: -5,
-                    x: isEven ? 5 : -5,
-                    transition: { duration: 0.3 },
-                }}
-                style={{
-                    transformStyle: "preserve-3d",
-                    transform: `perspective(1000px) rotateY(${mousePosition.x * (isEven ? -3 : 3)
-                        }deg) rotateX(${mousePosition.y * -3}deg)`,
-                }}
-                onMouseEnter={() => setActiveEvent(event.id)}
-                onMouseLeave={() => setActiveEvent(null)}
+            <div
+                className={`relative z-10 bg-slate-900/90 backdrop-blur-lg rounded-2xl overflow-hidden shadow-xl border border-slate-800 h-full flex flex-col`}
             >
                 {event.image && (
-                    <div className="relative h-40 md:h-48 overflow-hidden">
-                        <motion.img
+                    <div className="relative h-48 md:h-64 overflow-hidden flex-shrink-0">
+                        <img
                             src={event.image}
                             alt={event.title}
                             className="w-full h-full object-cover"
-                            initial={{ scale: 1.1 }}
-                            animate={{
-                                scale: activeEvent === event.id ? 1.03 : 1,
-                                y: activeEvent === event.id ? -6 : 0,
-                            }}
-                            transition={{ duration: 0.8 }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
 
@@ -159,8 +80,8 @@ const TimelineItem: React.FC<{
                     </div>
                 )}
 
-                <div className="p-6">
-                    <div className="flex items-center justify-between mb-3">
+                <div className="p-6 md:p-8 flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
                         <span
                             className={`text-xs md:text-sm font-mono ${accentColor.replace(
                                 "bg-",
@@ -169,57 +90,29 @@ const TimelineItem: React.FC<{
                         >
                             {event.date}
                         </span>
-
-                        <motion.div
-                            className={`w-3 h-3 rounded-full ${eventColor}`}
-                            animate={{
-                                scale: [1, 1.5, 1],
-                                opacity: [0.7, 1, 0.7],
-                            }}
-                            transition={{
-                                repeat: Infinity,
-                                duration: 2,
-                                repeatType: "reverse",
-                            }}
-                        />
                     </div>
 
-                    <h3 className="text-lg md:text-2xl font-semibold text-white mb-1">
+                    <h3 className="text-xl md:text-2xl font-semibold text-white mb-3">
                         {event.title}
                     </h3>
 
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{
-                            height: activeEvent === event.id ? "auto" : 0,
-                            opacity: activeEvent === event.id ? 1 : 0,
-                        }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden"
-                    >
-                        <p className="text-sm md:text-base text-slate-300 mt-2 leading-relaxed">
-                            {event.description}
-                        </p>
+                    <p className="text-sm md:text-base text-slate-300 leading-relaxed flex-1">
+                        {event.description}
+                    </p>
 
-                        {event.link && (
-                            <a
-                                href={event.link.url}
-                                className={`inline-block mt-4 px-4 py-2 ${primaryColor} hover:bg-opacity-80 rounded-lg font-medium text-sm transition-all duration-200 transform hover:-translate-y-1`}
-                            >
-                                {event.link.text}
-                            </a>
-                        )}
-                    </motion.div>
+                    {event.link && (
+                        <a
+                            href={event.link.url}
+                            className={`inline-block mt-6 px-4 py-2 ${primaryColor} hover:bg-opacity-80 rounded-lg font-medium text-sm transition-all duration-200 w-fit`}
+                        >
+                            {event.link.text}
+                        </a>
+                    )}
                 </div>
 
-                <motion.div
-                    className={`absolute bottom-0 left-0 h-1 ${eventColor}`}
-                    initial={{ width: "0%" }}
-                    animate={{ width: activeEvent === event.id ? "100%" : "0%" }}
-                    transition={{ duration: 0.5 }}
-                />
-            </motion.div>
-        </motion.div>
+                <div className={`h-1 w-full ${eventColor}`} />
+            </div>
+        </div>
     )
 }
 
@@ -230,42 +123,18 @@ export const Timeline3D: React.FC<Timeline3DProps> = ({
     secondaryColor = defaultColors.secondary,
     textColor = defaultColors.text,
     accentColor = defaultColors.accent,
-    showImages = true,
     className = "",
 }) => {
-    const [activeEvent, setActiveEvent] = useState<string | null>(null)
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-    const containerRef = useRef<HTMLDivElement>(null)
+    const targetRef = useRef<HTMLDivElement>(null)
+    const { scrollYProgress } = useScroll({
+        target: targetRef,
+    })
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!containerRef.current) return
-            const rect = containerRef.current.getBoundingClientRect()
-            setMousePosition({
-                x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
-                y: ((e.clientY - rect.top) / rect.height) * 2 - 1,
-            })
-        }
-
-        const container = containerRef.current
-        if (container) {
-            container.addEventListener("mousemove", handleMouseMove)
-        }
-
-        return () => {
-            if (container) {
-                container.removeEventListener("mousemove", handleMouseMove)
-            }
-        }
-    }, [])
+    const x = useTransform(scrollYProgress, [0, 1], ["1%", "-55%"])
 
     return (
-        <div
-            className={`w-full ${backgroundColor} py-16 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden ${textColor} ${className}`}
-            ref={containerRef}
-        >
-            <div className="max-w-5xl lg:max-w-6xl mx-auto relative">
-                {/* Decorative elements - subtle floating blobs */}
+        <section ref={targetRef} className={`relative h-[300vh] ${backgroundColor} ${className}`}>
+            <div className="sticky top-0 flex h-screen items-center overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                     {[...Array(6)].map((_, i) => (
                         <motion.div
@@ -293,14 +162,8 @@ export const Timeline3D: React.FC<Timeline3DProps> = ({
                     ))}
                 </div>
 
-                {/* Main timeline content */}
-                <motion.div
-                    className="relative z-10"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                >
-                    <div className="text-center mb-12 md:mb-16">
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center h-full">
+                    <div className="mb-12 md:mb-16 max-w-2xl">
                         <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-slate-400">
                             Experience
                         </p>
@@ -310,17 +173,16 @@ export const Timeline3D: React.FC<Timeline3DProps> = ({
                                 <span className="relative">Roles &amp; Impact Timeline</span>
                             </span>
                         </h2>
-                        <p className="mt-3 text-sm md:text-base text-slate-300 max-w-2xl mx-auto">
+                        <p className="mt-3 text-sm md:text-base text-slate-300">
                             A journey from Infrastructure as Code and cloud-native migrations to Zero-Trust
                             security, GitOps, and cost-optimized Kubernetes platforms.
                         </p>
                     </div>
 
-                    <div className="relative">
-                        {/* Central line */}
-                        <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-[3px] bg-slate-800 rounded-full" />
+                    <motion.div style={{ x }} className="flex gap-8 items-center pl-4">
+                        {/* Horizontal Line */}
+                        <div className="absolute top-0 left-0 w-[200vw] h-1 bg-slate-800 -translate-y-1/2 top-1/2 hidden md:block" />
 
-                        {/* Timeline events */}
                         {events.map((event, index) => (
                             <TimelineItem
                                 key={event.id}
@@ -328,20 +190,13 @@ export const Timeline3D: React.FC<Timeline3DProps> = ({
                                 index={index}
                                 primaryColor={primaryColor}
                                 accentColor={accentColor}
-                                mousePosition={mousePosition}
-                                activeEvent={activeEvent}
-                                setActiveEvent={setActiveEvent}
                             />
                         ))}
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </div>
             </div>
-        </div>
+        </section>
     )
 }
 
 export default Timeline3D
-
-// Safelist for dynamic classes used in this component
-// bg-indigo-500 bg-emerald-500 bg-violet-500
-// text-indigo-500 text-emerald-500 text-violet-500
